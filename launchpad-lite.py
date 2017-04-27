@@ -1,6 +1,7 @@
 import pygame, time
 
 pygame.init()
+pygame.mixer.init()
 
 white = 255,255,255
 black = 0,0,0
@@ -15,16 +16,18 @@ gameDisplay = pygame.display.set_mode(size)
 pygame.display.set_caption('A bit Racey')
 
 clock = pygame.time.Clock()
-# ----- Classes -----
 
-
+# ----- Library -----
+library = []
+trumpet = pygame.mixer.Sound('Trumpet.wav')
+library.append(trumpet)
 
 
 
 # ----- Miscellaneous -----
 SR = 44100
 done = False
-recording = False
+recording = True
 record_time = -1
 
 Q = [0] # List of lists [[KEY, Time, Up/Down], [KEY,Time,Up/Down]] etc
@@ -36,7 +39,7 @@ while not done:
     # Event Handling
     for event in pygame.event.get():
        # Not Recording        
-        if not recording:
+        if recording is False:
            if event.type == pygame.KEYDOWN:
                if event.key == pygame.K_r:
                    recording = True
@@ -44,17 +47,24 @@ while not done:
         
         
         # Recording
-        if recording:
+        if recording is True:
             event_time = time.time()
             if event.type == pygame.KEYDOWN:
+                # Stop Recording
+                if event.key == pygame.K_r:
+                    recording = False
+                    
+                # Launch Sounds
                 if event.key == pygame.K_q:
                     Q.append([0, event_time - record_time, 1])
+                    library[0].play()
                 if event.key == pygame.K_w:
                     Q.append([1, event_time - record_time, 1])
                 if event.key == pygame.K_e:
                     Q.append([2, event_time - record_time, 1])
                 if event.key == pygame.K_a:
                     Q.append([3, event_time - record_time, 1])
+                    pygame.mixer.music.load('Trumpet.wav')
                 if event.key == pygame.K_s:
                     Q.append([4, event_time - record_time, 1])
                 if event.key == pygame.K_d:
@@ -69,6 +79,7 @@ while not done:
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_q:
                     Q.append([0, event_time - record_time, 0])
+                    library[0].stop()
                 if event.key == pygame.K_w:
                     Q.append([1, event_time - record_time, 0])
                 if event.key == pygame.K_e:
