@@ -1,9 +1,12 @@
 import pygame, time
+from pygame.locals import*
 from cs591Utilities import *
 from math import pi,sin,floor
 
 pygame.init()
+pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
+flags = DOUBLEBUF
 
 white = 255,255,255
 black = 0,0,0
@@ -14,43 +17,45 @@ size = screen_width, screen_height = 160 * scale, 120 * scale
 #background = pygame.image.load("bg_raw.png")
 #background = pygame.transform.scale(background, (160 * scale, 120 * scale))
 
-gameDisplay = pygame.display.set_mode(size)
+gameDisplay = pygame.display.set_mode(size, flags)
+gameDisplay.set_alpha(None)
 pygame.display.set_caption('Launchpad-Lite')
 
 clock = pygame.time.Clock()
 
 # ----- Library -----
+
 def createSineWave(freq, ampl, pha, dur):
     out = list()
     for sample in range(floor(44100 * dur)):
         out.append( (2**15 - 1) * ampl * sin (freq * 2 * pi * sample/44100 + pha))
     return out
 
-X = createSineWave(440, 1, 1, 1)
+X = createSineWave(440, 0.1, 1, 1)
 writeWaveFile("0.wav", X)
 
-X = createSineWave(440*9/8, 1, 1, 1)
+X = createSineWave(440*9/8, 0.1, 1, 1)
 writeWaveFile("1.wav", X)
 
-X = createSineWave(440*5/4, 1, 1, 1)
+X = createSineWave(440*5/4, 0.1, 1, 1)
 writeWaveFile("2.wav", X)
 
-X = createSineWave(440*3/2, 1, 1, 1)
+X = createSineWave(440*3/2, 0.1, 1, 1)
 writeWaveFile("3.wav", X)
 
-X = createSineWave(440*5/3, 1, 1, 1)
+X = createSineWave(440*5/3, 0.1, 1, 1)
 writeWaveFile("4.wav", X)
 
-X = createSineWave(440*2, 1, 1, 1)
+X = createSineWave(440*2, 0.1, 1, 1)
 writeWaveFile("5.wav", X)
 
-X = createSineWave(440*2*9/8, 1, 1, 1)
+X = createSineWave(440*2*9/8, 0.1, 1, 1)
 writeWaveFile("6.wav", X)
 
-X = createSineWave(440*2*5/4, 1, 1, 1)
+X = createSineWave(440*2*5/4, 0.1, 1, 1)
 writeWaveFile("7.wav", X)
 
-X = createSineWave(440*2*3/2, 1, 1, 1)
+X = createSineWave(440*2*3/2, 0.1, 1, 1)
 writeWaveFile("8.wav", X)
 
 
@@ -109,31 +114,31 @@ while not done:
                 # Launch Sounds
                 if event.key == pygame.K_q:
                     Q.append([0, event_time - record_time, 1])
-                    library[0].play()
+                    library[0].play(loops=-1)
                 if event.key == pygame.K_w:
                     Q.append([1, event_time - record_time, 1])
-                    library[1].play()
+                    library[1].play(loops=-1)
                 if event.key == pygame.K_e:
                     Q.append([2, event_time - record_time, 1])
-                    library[2].play()
+                    library[2].play(loops=-1)
                 if event.key == pygame.K_a:
                     Q.append([3, event_time - record_time, 1])
-                    library[3].play()
+                    library[3].play(loops=-1)
                 if event.key == pygame.K_s:
                     Q.append([4, event_time - record_time, 1])
-                    library[4].play()
+                    library[4].play(loops=-1)
                 if event.key == pygame.K_d:
                     Q.append([5, event_time - record_time, 1])
-                    library[5].play()
+                    library[5].play(loops=-1)
                 if event.key == pygame.K_z:
                     Q.append([6, event_time - record_time, 1])
-                    library[6].play()
+                    library[6].play(loops=-1)
                 if event.key == pygame.K_x:
                     Q.append([7, event_time - record_time, 1])
-                    library[7].play()
+                    library[7].play(loops=-1)
                 if event.key == pygame.K_c:
                     Q.append([8, event_time - record_time, 1])
-                    library[8].play()
+                    library[8].play(loops=-1)
                 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_q:
@@ -164,9 +169,10 @@ while not done:
                     Q.append([8, event_time - record_time, 0])
                     library[8].stop()
             
-        if event.type == pygame.QUIT:
+        elif event.type == pygame.QUIT:
             pygame.quit()
             quit()
-
-        gameDisplay.fill(white)
-
+            
+        #end event type
+    #end for event in pygame.event.get
+#end while done
