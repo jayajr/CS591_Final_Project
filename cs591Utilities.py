@@ -440,5 +440,3 @@ def analyzeSpectrum(X,limit=5000,relative = True,logscaleX = False, logscaleY = 
         F = F[:lim]
         S = S[:lim]
     displaySpectrum(F,S,True,True,printSpectrum=False)
-    
-    
