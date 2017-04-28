@@ -1,6 +1,7 @@
-import pygame, time
-from pygame.locals import*
+import pygame, time, os
+from pygame.locals import *
 from cs591Utilities import *
+from audioProcessing import *
 from math import pi,sin,floor
 
 pygame.init()
@@ -81,13 +82,14 @@ library.append(six)
 library.append(seven)
 library.append(eight)
 
+
 # ----- Miscellaneous -----
 SR = 44100
 done = False
 recording = False
 record_time = -1
 
-Q = [0] # List of lists [[KEY, Time, Up/Down], [KEY,Time,Up/Down]] etc
+Q = [] # List of tuples [(KEY, Time, Up/Down), (KEY,Time,Up/Down)] etc
 S = [0] * SR * 5 # 5 second blank signal
 
 
@@ -98,9 +100,12 @@ while not done:
        # Not Recording        
         if recording is False:
            if event.type == pygame.KEYDOWN:
-               if event.key == pygame.K_1:
+                if event.key == pygame.K_1:
                    recording = True
                    record_time = time.time()
+
+                if event.key == pygame.K_3:
+                    playback.play()
         
         
         # Recording
@@ -110,63 +115,70 @@ while not done:
                 # Stop Recording
                 if event.key == pygame.K_2:
                     recording = False
+                    #for i in range(len(Q)):
+                    #    print(Q[i])
+
+                    constructSignal(Q)
+                    playback = pygame.mixer.Sound("recordedSignal.wav")
+                    #playback.play()
+                    Q=[]
                     
                 # Launch Sounds
                 if event.key == pygame.K_q:
-                    Q.append([0, event_time - record_time, 1])
+                    Q.append((0, event_time - record_time, 1))
                     library[0].play(loops=-1)
                 if event.key == pygame.K_w:
-                    Q.append([1, event_time - record_time, 1])
+                    Q.append((1, event_time - record_time, 1))
                     library[1].play(loops=-1)
                 if event.key == pygame.K_e:
-                    Q.append([2, event_time - record_time, 1])
+                    Q.append((2, event_time - record_time, 1))
                     library[2].play(loops=-1)
                 if event.key == pygame.K_a:
-                    Q.append([3, event_time - record_time, 1])
+                    Q.append((3, event_time - record_time, 1))
                     library[3].play(loops=-1)
                 if event.key == pygame.K_s:
-                    Q.append([4, event_time - record_time, 1])
+                    Q.append((4, event_time - record_time, 1))
                     library[4].play(loops=-1)
                 if event.key == pygame.K_d:
-                    Q.append([5, event_time - record_time, 1])
+                    Q.append((5, event_time - record_time, 1))
                     library[5].play(loops=-1)
                 if event.key == pygame.K_z:
-                    Q.append([6, event_time - record_time, 1])
+                    Q.append((6, event_time - record_time, 1))
                     library[6].play(loops=-1)
                 if event.key == pygame.K_x:
-                    Q.append([7, event_time - record_time, 1])
+                    Q.append((7, event_time - record_time, 1))
                     library[7].play(loops=-1)
                 if event.key == pygame.K_c:
-                    Q.append([8, event_time - record_time, 1])
+                    Q.append((8, event_time - record_time, 1))
                     library[8].play(loops=-1)
                 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_q:
-                    Q.append([0, event_time - record_time, 0])
+                    Q.append((0, event_time - record_time, 0))
                     library[0].stop()
                 if event.key == pygame.K_w:
-                    Q.append([1, event_time - record_time, 0])
+                    Q.append((1, event_time - record_time, 0))
                     library[1].stop()
                 if event.key == pygame.K_e:
-                    Q.append([2, event_time - record_time, 0])
+                    Q.append((2, event_time - record_time, 0))
                     library[2].stop()
                 if event.key == pygame.K_a:
-                    Q.append([3, event_time - record_time, 0])
+                    Q.append((3, event_time - record_time, 0))
                     library[3].stop()
                 if event.key == pygame.K_s:
-                    Q.append([4, event_time - record_time, 0])
+                    Q.append((4, event_time - record_time, 0))
                     library[4].stop()
                 if event.key == pygame.K_d:
-                    Q.append([5, event_time - record_time, 0])
+                    Q.append((5, event_time - record_time, 0))
                     library[5].stop()
                 if event.key == pygame.K_z:
-                    Q.append([6, event_time - record_time, 0])
+                    Q.append((6, event_time - record_time, 0))
                     library[6].stop()
                 if event.key == pygame.K_x:
-                    Q.append([7, event_time - record_time, 0])
+                    Q.append((7, event_time - record_time, 0))
                     library[7].stop()
                 if event.key == pygame.K_c:
-                    Q.append([8, event_time - record_time, 0])
+                    Q.append((8, event_time - record_time, 0))
                     library[8].stop()
             
         elif event.type == pygame.QUIT:

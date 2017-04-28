@@ -5,9 +5,9 @@ from math import floor
 '''
 Constructs a signal given a list of tuples signifying key presses
 '''
-def constructSignal(beatList, duration=5):
+def constructSignal(beatList):
 
-	signal = [0] * SR * duration
+	signal = [0] * SR * 5
 
 	for i in range(len(beatList)):
 		# get values from tuple
@@ -33,6 +33,9 @@ def constructSignal(beatList, duration=5):
 
 
 	# write to wav file
+	for i in range(len(signal)):
+		signal[i] /= 2
+
 	writeWaveFile("recordedSignal.wav", signal)
 
 	return signal
@@ -57,7 +60,7 @@ def findKeyUp(downIndex, downKey, beatList):
 '''
 Makes a signal given the key and apply ASR fileter
 '''
-def getBeat(key, duration):
+def getBeat(key, duration, ASR = True):
 
 	if(key == 0):
 		freq = 440
@@ -88,7 +91,10 @@ def getBeat(key, duration):
 	L = 1
 	H = R * .3
 
-	return applyASR(X, A, S, L, R, H)
+	if ASR is True:
+		X = applyASR(X, A, S, L, R, H)
+
+	return X
 
 
 def applyASR(X,A,S,L,R,H):
@@ -110,11 +116,16 @@ def applyASR(X,A,S,L,R,H):
 
 def addBeatToSignal(beat, offset, signal):
 
+	sigSize = len(signal)
+	beatSize = len(beat)
 	sampleOffset = floor(offset * SR)
+	
+	if beatSize + sampleOffset > sigSize:
+		A = [0]*beatSize*2
+		signal.extend(A)
 
-	for i in range(int(sampleOffset), int(len(beat) + sampleOffset)):
-
-		signal[i] += beat[i-sampleOffset]
+	for i in range(beatSize):
+		signal[sampleOffset + i] += beat[i]
 
 
 	return signal
