@@ -2,6 +2,7 @@ import pygame, time, os
 from pygame.locals import *
 from cs591Utilities import *
 from audioProcessing import *
+from audioInitialization import *
 from math import pi,sin,floor
 
 pygame.init()
@@ -25,62 +26,8 @@ pygame.display.set_caption('Launchpad-Lite')
 clock = pygame.time.Clock()
 
 # ----- Library -----
-
-def createSineWave(freq, ampl, pha, dur):
-    out = list()
-    for sample in range(floor(44100 * dur)):
-        out.append( (2**15 - 1) * ampl * sin (freq * 2 * pi * sample/44100 + pha))
-    return out
-
-X = createSineWave(440, 0.1, 1, 1)
-writeWaveFile("0.wav", X)
-
-X = createSineWave(440*9/8, 0.1, 1, 1)
-writeWaveFile("1.wav", X)
-
-X = createSineWave(440*5/4, 0.1, 1, 1)
-writeWaveFile("2.wav", X)
-
-X = createSineWave(440*3/2, 0.1, 1, 1)
-writeWaveFile("3.wav", X)
-
-X = createSineWave(440*5/3, 0.1, 1, 1)
-writeWaveFile("4.wav", X)
-
-X = createSineWave(440*2, 0.1, 1, 1)
-writeWaveFile("5.wav", X)
-
-X = createSineWave(440*2*9/8, 0.1, 1, 1)
-writeWaveFile("6.wav", X)
-
-X = createSineWave(440*2*5/4, 0.1, 1, 1)
-writeWaveFile("7.wav", X)
-
-X = createSineWave(440*2*3/2, 0.1, 1, 1)
-writeWaveFile("8.wav", X)
-
-
-library = []
-
-zero = pygame.mixer.Sound('0.wav')
-one = pygame.mixer.Sound('1.wav')
-two = pygame.mixer.Sound('2.wav')
-three = pygame.mixer.Sound('3.wav')
-four = pygame.mixer.Sound('4.wav')
-five = pygame.mixer.Sound('5.wav')
-six = pygame.mixer.Sound('6.wav')
-seven = pygame.mixer.Sound('7.wav')
-eight = pygame.mixer.Sound('8.wav')
-
-library.append(zero)
-library.append(one)
-library.append(two)
-library.append(three)
-library.append(four)
-library.append(five)
-library.append(six)
-library.append(seven)
-library.append(eight)
+library = initLibrarySine();
+#library = initLibraryBell();
 
 
 # ----- Button Display Class -----
