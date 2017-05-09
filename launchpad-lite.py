@@ -108,6 +108,11 @@ done = False
 recording = False
 record_time = -1
 
+ASR = False
+PITCH = False
+pitch_scale = 1.0
+
+
 Q = [] # List of tuples [(KEY, Time, Up/Down), (KEY,Time,Up/Down)] etc
 S = [0] * SR * 5 # 5 second blank signal
 
@@ -123,9 +128,39 @@ while not done:
                 if event.key == pygame.K_1:
                    recording = True
                    record_time = time.time()
+                   print("Recording...")
 
                 if event.key == pygame.K_3:
+                    print("Playback sound...")
                     playback.play()
+                    print("Playback complete!")
+                if event.key == pygame.K_EQUALS and pitch_scale < 4:
+                    pitch_scale += 0.25
+                    print("Pitch Scale == " + str(pitch_scale))
+                if event.key == pygame.K_MINUS and pitch_scale > 0.25:
+                    pitch_scale -= 0.25
+                    print("Pitch Scale == " + str(pitch_scale))
+                if event.key == pygame.K_i and PITCH is False:
+                    PITCH = True
+                    print("Pitch Mod is on")
+                if event.key == pygame.K_o and PITCH is True:
+                    PITCH = False
+                    print("Pitch Mod is off")
+                if event.key == pygame.K_k and ASR is False:
+                    ASR = True
+                    print("ASR Mod is on")
+                if event.key == pygame.K_l and ASR is True:
+                    ASR = False
+                    print("ASR Mod is off")
+                if event.key == pygame.K_p:
+                    print("Modifying pitch...")
+                    signal = readWaveFile("recordedSignal.wav")
+                    modifyPitch(signal, pitch_scale)
+                    writeWaveFile("recordedSignal.wav", signal)
+                    playback = pygame.mixer.Sound("recordedSignal.wav")
+                    print("Modifying complete!")
+                    playback.play()
+                    Q=[]
         
         
         # Recording
@@ -135,12 +170,13 @@ while not done:
                 # Stop Recording
                 if event.key == pygame.K_2:
                     recording = False
+                    print("Recording Stopped! Saving Recording...")
                     #for i in range(len(Q)):
                     #    print(Q[i])
 
-                    constructSignal(Q)
+                    constructSignal(Q, ASR, PITCH, pitch_scale)
                     playback = pygame.mixer.Sound("recordedSignal.wav")
-                    #playback.play()
+                    playback.play()
                     Q=[]
                     
                 # Launch Sounds
@@ -171,6 +207,7 @@ while not done:
                 if event.key == pygame.K_c:
                     Q.append((8, event_time - record_time, 1))
                     library[8].play(loops=-1)
+
                 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_q:
