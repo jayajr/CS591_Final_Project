@@ -1,11 +1,12 @@
 import time
 from cs591Utilities import *
 from math import floor
+from scipy.interpolate import interp1d
 
 '''
 Constructs a signal given a list of tuples signifying key presses
 '''
-def constructSignal(beatList):
+def constructSignal(beatList, ASR = False, pitch = False, pitchF = 1.0):
 
 	signal = [0] * SR * 5
 
@@ -27,7 +28,7 @@ def constructSignal(beatList):
 			beatDuration = upTime - downTime
 
 			# signal with an ASR filter applied
-			beat = getBeat(downKey, beatDuration)
+			beat = getBeat(downKey, beatDuration, ASR, pitch, pitchF)
 
 			signal = addBeatToSignal(beat, downTime, signal)
 
@@ -60,7 +61,7 @@ def findKeyUp(downIndex, downKey, beatList):
 '''
 Makes a signal given the key and apply ASR fileter
 '''
-def getBeat(key, duration, ASR = True):
+def getBeat(key, duration, ASR, pitch, pitchF):
 
 	if(key == 0):
 		freq = 440
@@ -85,14 +86,17 @@ def getBeat(key, duration, ASR = True):
 
 	X = makeSignal([spectrum], duration)
 
-	A = .1
-	S = (duration - A) * .2
-	R = (duration - A - S) * .8
-	L = 1
-	H = R * .3
-
 	if ASR is True:
+		A = .1
+		S = (duration - A) * .2
+		R = (duration - A - S) * .8
+		L = 1
+		H = R * .3
+
 		X = applyASR(X, A, S, L, R, H)
+	
+	if pitch is True:
+		X = modifyPitch(X, pitchF)
 
 	return X
 
@@ -136,10 +140,20 @@ def addBeatToSignal(beat, offset, signal):
 Will modify the pitch of a given singal by some scale
 and will return that newly modified beat for use
 '''
-def modifyPitch(beat, scale):
+def modifyPitch(X, P):
+    W = 100
+    Wf = W + 5
 
-	pass
+    Xstretched = []
 
+    for start in range(0,len(X)-W,W):
+        Tf = range(start,start+Wf)   # sample nums for interpolation
+        Tnew = np.arange(start,start+W, 1/P)   # interpolated sample points
+        f = interp1d(Tf,X[start:start+Wf],kind='cubic') # must interpolate over extended window
+        Z = [f(x) for x in Tnew]     # signal over interpolated points
+        Xstretched.extend(Z)
+           
+    return Xstretched
 
 
 '''
