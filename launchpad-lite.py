@@ -153,9 +153,9 @@ while not done:
                     ASR = False
                     print("ASR Mod is off")
                 if event.key == pygame.K_p:
-                    print("Modifying pitch...")
+                    print("Modifying pitch...this may take some time!")
                     signal = readWaveFile("recordedSignal.wav")
-                    modifyPitch(signal, pitch_scale)
+                    signal = modifyPitch(signal, pitch_scale)
                     writeWaveFile("recordedSignal.wav", signal)
                     playback = pygame.mixer.Sound("recordedSignal.wav")
                     print("Modifying complete!")
