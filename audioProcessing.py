@@ -12,7 +12,6 @@ def constructSignal(beatList, ASR = False, pitch = False, pitchF = 1.0):
 
 	for i in range(len(beatList)):
 		# get values from tuple
-
 		downKey = beatList[i][0]
 		downTime = beatList[i][1]
 		upDown = beatList[i][2]
@@ -28,10 +27,13 @@ def constructSignal(beatList, ASR = False, pitch = False, pitchF = 1.0):
 			beatDuration = upTime - downTime
 
 			# signal with an ASR filter applied
-			beat = getBeat(downKey, beatDuration, ASR, pitch, pitchF)
+			beat = getBeat(downKey, beatDuration, ASR)
 
 			signal = addBeatToSignal(beat, downTime, signal)
 
+
+	if pitch is True:
+		signal = modifyPitch(signal, pitchF)
 
 	# write to wav file
 	for i in range(len(signal)):
@@ -61,7 +63,7 @@ def findKeyUp(downIndex, downKey, beatList):
 '''
 Makes a signal given the key and apply ASR fileter
 '''
-def getBeat(key, duration, ASR, pitch, pitchF):
+def getBeat(key, duration, ASR, tremolo = False):
 
 	if(key == 0):
 		freq = 440
@@ -95,8 +97,8 @@ def getBeat(key, duration, ASR, pitch, pitchF):
 
 		X = applyASR(X, A, S, L, R, H)
 	
-	if pitch is True:
-		X = modifyPitch(X, pitchF)
+	if tremolo is True:
+		X = applyTremolo(X, .5, 10)
 
 	return X
 
@@ -137,8 +139,8 @@ def addBeatToSignal(beat, offset, signal):
 
 
 '''
-Will modify the pitch of a given singal by some scale
-and will return that newly modified beat for use
+Will modify the pitch/time of a given singal by some scale
+and will return that newly modified signal for use
 '''
 def modifyPitch(X, P):
     W = 100
@@ -155,6 +157,11 @@ def modifyPitch(X, P):
            
     return Xstretched
 
+def applyTremolo(X, A, f):
+    Y = list(X)
+    for k in range(len(X)):
+        Y[k] *= A * np.sin( 2 * np.pi * f * k / SR ) + (1.0 - A)
+    return Y
 
 '''
 Tests
